@@ -5,8 +5,12 @@ import "react-datepicker/dist/react-datepicker.css";
 // import "../../style/datePicker.css";
 import * as Yup from "yup";
 import { useAuthContext } from "../../context/AuthContext";
-import { createTimesheet, getEmployeeSummaryList } from "../../api/api";
-import { useNavigate } from "react-router-dom";
+import {
+  editTimesheet,
+  findTimesheetById,
+  getEmployeeSummaryList,
+} from "../../api/api";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function DatePickerFiled({ field, form }) {
   return (
@@ -20,13 +24,23 @@ function DatePickerFiled({ field, form }) {
   );
 }
 
-export default function CreateTimesheet() {
+export default function EditTimesheet() {
+  const { timesheetId } = useParams();
   const navigate = useNavigate();
   const { authUser } = useAuthContext();
+  const [timesheet, setTimesheet] = useState({});
   const [employeeList, setEmployeeList] = useState([]);
   const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
+    const getTimesheet = async () => {
+      try {
+        const timesheet = await findTimesheetById(authUser, timesheetId);
+        setTimesheet(timesheet);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     const getEmployeeList = async () => {
       try {
         const employee = await getEmployeeSummaryList(authUser);
@@ -37,39 +51,44 @@ export default function CreateTimesheet() {
         setEmployeeList([]);
       }
     };
+    getTimesheet();
     getEmployeeList();
   }, []);
 
   const initialValue = {
-    name: "",
-    leadId: "",
-    location: "",
-    remarks: "",
-    checkerId: "",
+    name: timesheet.pname,
+    leadId: timesheet.plead?.empId || "",
+    location: timesheet.location,
+    remarks: timesheet.remarks,
+    checkerId: timesheet.checker?.empId || "",
   };
   const createSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
-    leadId: Yup.string().required("Lead ID is required"),
+    leadId: Yup.number().required("Lead ID is required"),
     location: Yup.string().required("Location is required"),
-    remarks: Yup.string(),
-    checkerId: Yup.string().required("Checker ID is required"),
+    remarks: Yup.string().nullable(),
+    checkerId: Yup.number().required("Checker ID is required"),
   });
 
   const onSubmit = async (value) => {
     try {
-      const status = await createTimesheet(authUser, {
-        ...value,
-        leadId: Number(value.leadId),
-        checkerId: Number(value.checkerId),
-      });
-      if (status === 201) {
-        setStatusMessage("Create timesheet success");
+      const status = await editTimesheet(
+        authUser,
+        {
+          ...value,
+          leadId: Number(value.leadId),
+          checkerId: Number(value.checkerId),
+        },
+        timesheetId
+      );
+      if (status === 200) {
+        setStatusMessage("Edit timesheet success");
         setTimeout(() => {
           navigate("/");
         }, 1000);
       }
     } catch (error) {
-      setStatusMessage("Failed create timesheet");
+      setStatusMessage("Failed edit timesheet");
       console.log(error);
     } finally {
       setTimeout(() => {
@@ -81,9 +100,10 @@ export default function CreateTimesheet() {
     <div class="container my-4">
       <div class="row">
         <div class="col-md-8 mx-auto rounded border p-4">
-          <h2 class="text-center mb-5">New Timesheet</h2>
+          <h2 class="text-center mb-5">Edit Timesheet</h2>
 
           <Formik
+            enableReinitialize
             initialValues={initialValue}
             validationSchema={createSchema}
             onSubmit={(values) => {
@@ -179,9 +199,9 @@ export default function CreateTimesheet() {
                   </button>
                 </div>
                 <div class="col-sm-4 d-grid">
-                  <a class="btn btn-outline-primary" href="/timesheet">
+                  <Link class="btn btn-outline-primary" to="/">
                     Cancel
-                  </a>
+                  </Link>
                 </div>
                 {statusMessage && (
                   <p className="text-center mt-3">{statusMessage}</p>

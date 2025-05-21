@@ -10,6 +10,10 @@ import CreateTimesheet from "./pages/timesheet/Create";
 import EmployeePage from "./pages/employee/EmployeePage";
 import HrPage from "./pages/hr/HrPage";
 import EditEmployee from "./pages/employee/Edit";
+import EditTimesheet from "./pages/timesheet/Edit";
+import CheckerPage from "./pages/checker/CheckerPage";
+import ProceedTimesheet from "./pages/checker/Proceed";
+import { AdminPage } from "./pages/admin/AdminPage";
 
 function App() {
   return (
@@ -31,6 +35,14 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/"
@@ -49,6 +61,14 @@ function App() {
           }
         />
         <Route
+          path="/timesheet/edit/:timesheetId"
+          element={
+            <ProtectedRoute>
+              <EditTimesheet />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/employee"
           element={
             <ProtectedRoute>
@@ -61,6 +81,22 @@ function App() {
           element={
             <ProtectedRoute>
               <EditEmployee />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checker"
+          element={
+            <ProtectedRoute>
+              <CheckerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/timesheet/proceed/:timesheetId"
+          element={
+            <ProtectedRoute>
+              <ProceedTimesheet />
             </ProtectedRoute>
           }
         />

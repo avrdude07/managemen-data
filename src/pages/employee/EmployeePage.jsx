@@ -13,7 +13,8 @@ export default function EmployeePage() {
     const getEmployeeList = async () => {
       try {
         const employee = await getAllEmployee(authUser);
-        setEmployeeList(employee);
+        const filterdEmployee = employee.filter((emp) => emp.empName !== null);
+        setEmployeeList(filterdEmployee);
       } catch (error) {
         console.log(error);
         setEmployeeList([]);
@@ -50,7 +51,7 @@ export default function EmployeePage() {
                       ? format(employee.dateOfJoin, "dd/MM/yyyy")
                       : "-"}
                   </td>
-                  <td>{employee.manaer ? employee.manaer.empName : "-"}</td>
+                  <td>{employee.manager ? employee.manager.empName : "-"}</td>
                   <td>{employee.empEmail}</td>
                   <td>{employee.empPhone}</td>
                 </tr>

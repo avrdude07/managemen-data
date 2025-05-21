@@ -40,7 +40,7 @@ export const register = async (body) => {
 
 export const getAllTimesheet = async (token) => {
   try {
-    const response = await fetch(`${BASE_URL}/timesheet`, {
+    const response = await fetch(`${BASE_URL}/timesheet/all`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -51,7 +51,48 @@ export const getAllTimesheet = async (token) => {
       throw new Error("Fetch failed");
     }
 
-    return response.json();
+    const { timesheetList } = await response.json();
+    return timesheetList;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllTimesheetByChecker = async (token) => {
+  try {
+    const response = await fetch(`${BASE_URL}/timesheet/checker/all`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Fetch failed");
+    }
+
+    const { timesheetList } = await response.json();
+    return timesheetList;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllTimesheetByAdmin = async (token) => {
+  try {
+    const response = await fetch(`${BASE_URL}/timesheet/admin`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Fetch failed");
+    }
+
+    const { timesheetList } = await response.json();
+    return timesheetList;
   } catch (error) {
     console.log(error);
   }
@@ -71,6 +112,8 @@ export const createTimesheet = async (token, body) => {
     if (!response.ok) {
       throw new Error("Failed create timesheet.");
     }
+
+    return response.status;
   } catch (error) {
     console.log(error);
   }
@@ -88,16 +131,16 @@ export const findTimesheetById = async (token, id) => {
     if (!response.ok) {
       throw new Error("Failed get timesheet.");
     }
-
-    return response.json();
+    const { timesheet } = await response.json();
+    return timesheet;
   } catch (error) {
     console.log(error);
   }
 };
 
-export const editTimesheet = async (token, body, id) => {
+export const proceedTimesheetByChecker = async (token, body, id) => {
   try {
-    const response = await fetch(`${BASE_URL}/timesheet/edit?id=${id}`, {
+    const response = await fetch(`${BASE_URL}/timesheet/checker/edit/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -109,6 +152,27 @@ export const editTimesheet = async (token, body, id) => {
     if (!response.ok) {
       throw new Error("Failed edit timesheet.");
     }
+    return response.status;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const editTimesheet = async (token, body, id) => {
+  try {
+    const response = await fetch(`${BASE_URL}/timesheet/maker/edit/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed edit timesheet.");
+    }
+    return response.status;
   } catch (error) {
     console.log(error);
   }
@@ -116,7 +180,7 @@ export const editTimesheet = async (token, body, id) => {
 
 export const deleteTimesheet = async (token, id) => {
   try {
-    const response = await fetch(`${BASE_URL}/timesheet/delete?id=${id}`, {
+    const response = await fetch(`${BASE_URL}/timesheet/delete/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -127,6 +191,8 @@ export const deleteTimesheet = async (token, id) => {
     if (!response.ok) {
       throw new Error("Failed delete timesheet.");
     }
+
+    return response.status;
   } catch (error) {
     console.log(error);
   }
@@ -165,6 +231,7 @@ export const editEmployee = async (token, body) => {
     if (!response.ok) {
       throw new Error("Failed edit timesheet.");
     }
+    return response.status;
   } catch (error) {
     console.log(error);
   }

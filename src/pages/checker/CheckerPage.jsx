@@ -2,21 +2,18 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { deleteTimesheet, getAllTimesheet } from "../../api/api";
+import { getAllTimesheetByChecker } from "../../api/api";
 import { format } from "date-fns";
 import ConfirmDialog from "../../components/ConfirmationModal";
-import { getRolesFromToken } from "../../helpers/helpers";
 
-export default function TimesheetPage() {
+export default function CheckerPage() {
   const { authUser } = useAuthContext();
   const [tsList, setTsList] = useState([]);
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const getTsList = async () => {
       try {
-        const ts = await getAllTimesheet(authUser);
+        const ts = await getAllTimesheetByChecker(authUser);
         setTsList(ts);
       } catch (error) {
         console.log(error);
@@ -26,26 +23,14 @@ export default function TimesheetPage() {
     getTsList();
   }, [authUser]);
 
-  const onDelete = async () => {
-    try {
-      await deleteTimesheet(authUser, selectedId);
-      const newTimesheet = tsList.filter((item) => item.id != selectedId);
-      setTsList(newTimesheet);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   return (
     <div class="d-flex">
       <Sidebar />
 
       <div className="p-5" style={{ width: "100%" }}>
-        <h2 class="text-center">Timesheet Views</h2>
+        <h2 class="text-center">Checker Views</h2>
 
         <div className="mt-4 d-flex justify-content-between">
-          <Link to="/timesheet/create" class="btn btn-primary mb-3">
-            New Timesheet
-          </Link>
           <Link to="/" class="btn btn-primary mb-3">
             Home
           </Link>
@@ -92,38 +77,15 @@ export default function TimesheetPage() {
                     ? format(ts.checkerSubmitDate, "dd/MM/yyyy")
                     : "-"}
                 </td>
-                <td>
+                <td className="text-center align-middle">
                   {ts.checkerStatus === "Pending" && (
-                    <>
-                      <Link
-                        class="btn btn-primary btn-sm"
-                        to={`/timesheet/edit/${ts.id}`}
-                        style={{ width: "70px" }}
-                      >
-                        EDIT
-                      </Link>
-
-                      <button
-                        class="btn btn-danger btn-sm mt-1"
-                        style={{ width: "70px" }}
-                        onClick={() => {
-                          setShowDialog(true);
-                          setSelectedId(ts.id);
-                        }}
-                      >
-                        DELETE
-                      </button>
-                      <ConfirmDialog
-                        show={showDialog}
-                        onHide={() => setShowDialog(false)}
-                        onConfirm={() => {
-                          onDelete();
-                          setShowDialog(false);
-                        }}
-                        title="Delete Employee"
-                        message={`Are you sure you want to delete ?`}
-                      />
-                    </>
+                    <Link
+                      class="btn btn-primary btn-sm"
+                      to={`/timesheet/proceed/${ts.id}`}
+                      style={{ width: "70px" }}
+                    >
+                      Proceed
+                    </Link>
                   )}
                 </td>
               </tr>

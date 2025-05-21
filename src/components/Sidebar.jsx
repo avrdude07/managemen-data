@@ -21,11 +21,17 @@ export default function Sidebar() {
           <Nav.Link href="/" className="text-white">
             Timesheet
           </Nav.Link>
+          <Nav.Link href="/checker" className="text-white">
+            Checker View
+          </Nav.Link>
           <Nav.Link href="/employee" className="text-white">
             Employee
           </Nav.Link>
           <Nav.Link href="/my-profile" className="text-white">
             My Profile
+          </Nav.Link>
+          <Nav.Link href="/admin" className="text-white">
+            Admin View
           </Nav.Link>
         </div>
         <button
