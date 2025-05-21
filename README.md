@@ -9,8 +9,8 @@ This is the **React** frontend for the `java-project-be`, built using **Vite**. 
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/juniarc/midas-mini-project-fe.git
-cd midas-mini-project-fe-main
+git clone https://github.com/juniarc/cahya-version-mini-project-fe.git
+cd cahya-version-mini-project-fe-main
 ```
 
 ### 2. Install dependencies
