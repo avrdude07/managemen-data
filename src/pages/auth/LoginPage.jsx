@@ -40,9 +40,22 @@ export default function LoginPage() {
   return (
     <>
       <title>Login</title>
-      <div className="container d-flex justify-content-center align-items-center vh-100">
-        <div className="card p-4 shadow" style={{ width: "40vw" }}>
-          <h2 className="mb-4 text-center">Login</h2>
+      <div
+        className="d-flex justify-content-center align-items-center vh-100"
+        style={{
+          background: "linear-gradient(to right, #facc15, #f59e0b)", // kuning -> orange
+        }}
+      >
+        <div
+          className="card p-4 shadow-lg"
+          style={{
+            width: "380px",
+            borderRadius: "16px",
+          }}
+        >
+          <h2 className="text-center mb-1 fw-bold">CRUD DATA BIMAS KATOLIK</h2>
+          <h5 className="text-center mb-4">LOGIN</h5>
+
           <Formik
             initialValues={initialValue}
             validationSchema={createSchema}
@@ -50,32 +63,34 @@ export default function LoginPage() {
           >
             {({ status }) => (
               <Form>
-                <div className="mb-3 ">
+                {/* Username */}
+                <div className="mb-3">
                   <label
                     htmlFor="username"
-                    className="form-label text-start"
+                    className="form-label fw-semibold text-start"
                     style={{ width: "100%" }}
                   >
-                    Username
+                    Email
                   </label>
                   <Field
                     type="text"
                     className="form-control"
                     name="username"
-                    placeholder="Enter your username"
+                    placeholder="Enter your email"
                   />
                   <ErrorMessage
                     name="username"
                     component="div"
                     className="text-start"
-                    style={{ color: "red" }}
+                    style={{ color: "red", fontSize: "0.9rem" }}
                   />
                 </div>
 
-                <div className="mb-3 ">
+                {/* Password */}
+                <div className="mb-3">
                   <label
                     htmlFor="password"
-                    className="form-label text-start"
+                    className="form-label fw-semibold text-start"
                     style={{ width: "100%" }}
                   >
                     Password
@@ -90,27 +105,37 @@ export default function LoginPage() {
                     name="password"
                     component="div"
                     className="text-start"
-                    style={{ color: "red" }}
+                    style={{ color: "red", fontSize: "0.9rem" }}
                   />
                 </div>
 
-                <div class="row" style={{ width: "100%" }}>
-                  <div class="mt-3">
-                    <button
-                      type="submit"
-                      class="btn btn-primary"
-                      style={{ width: "100%" }}
-                    >
-                      Login
-                    </button>
-                  </div>
-                  <p className="mt-3">
-                    Don't have an account ? <Link to="/signup">Sign Up</Link>
-                  </p>
-                  {status && (
-                    <p className="text-danger text-center mt-3">{status}</p>
-                  )}
+                {/* Tombol Login */}
+                <div className="mt-3">
+                  <button
+                    type="submit"
+                    className="btn w-100 text-white fw-bold"
+                    style={{
+                      backgroundColor: "#f59e0b",
+                      border: "none",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    LOGIN
+                  </button>
                 </div>
+
+                {/* Reset Password */}
+                <p className="mt-3 text-center" style={{ fontSize: "0.9rem" }}>
+                  Don't have an account ?{" "}
+                  <Link to="/signup" style={{ color: "#f59e0b", fontWeight: "500" }}>
+                    Sign Up
+                  </Link>
+                </p>
+
+                {/* Error Status */}
+                {status && (
+                  <p className="text-danger text-center mt-3">{status}</p>
+                )}
               </Form>
             )}
           </Formik>

@@ -35,7 +35,12 @@ export default function SignupPage() {
   return (
     <>
       <title>Sign Up</title>
-      <div className="container d-flex justify-content-center align-items-center vh-100">
+      <div
+        className="d-flex justify-content-center align-items-center vh-100"
+        style={{
+          background: "linear-gradient(to right, #facc15, #f59e0b)", // kuning → orange
+        }}
+      >
         <div class="card p-4 shadow" style={{ width: "40vw" }}>
           <h2 class="text-center mb-5">Sign Up</h2>
 
