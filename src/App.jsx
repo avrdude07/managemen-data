@@ -5,6 +5,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ProtectedRoute from "./context/ProtectedRoute";
 import PublicRoute from "./context/PublicRoute";
+import PenyuluhPage from "./pages/penyuluh/PenyuluhPage";
 import TimesheetPage from "./pages/timesheet/TimesheetPage";
 import CreateTimesheet from "./pages/timesheet/Create";
 import EmployeePage from "./pages/employee/EmployeePage";
@@ -27,14 +28,8 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <SignupPage />
-            </PublicRoute>
-          }
-        />
+        <Route path="/signup" element={<PublicRoute> <SignupPage /> </PublicRoute>}/>
+        <Route path="/penyuluh" element={<ProtectedRoute> <PenyuluhPage /> </ProtectedRoute>} />
         <Route
           path="/admin"
           element={

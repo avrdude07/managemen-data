@@ -278,3 +278,60 @@ export const getEmployeeSummaryList = async (token) => {
     console.log(error);
   }
 };
+
+// Fungsi untuk mendapatkan data penyuluh
+export const getPenyuluhData = async (authUser, params = {}) => {
+  try {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`http://localhost:8081/api/v1/penyuluh?${queryString}`, {
+      headers: {
+        'Authorization': `Bearer ${authUser}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching penyuluh data:', error);
+    throw error;
+  }
+};
+
+// Fungsi untuk menghapus data penyuluh
+export const deletePenyuluh = async (authUser, penyuluhId) => {
+  try {
+    const response = await fetch(`http://localhost:8081/api/v1/penyuluh/${penyuluhId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authUser}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    // Untuk status 204 No Content, kita tidak perlu parsing JSON
+    if (response.status === 204) {
+      return { code: 200, message: "Data berhasil dihapus" };
+    }
+    
+    // Untuk status lainnya, coba parsing JSON jika ada
+    if (response.ok) {
+      try {
+        const data = await response.json();
+        return data;
+      } catch (jsonError) {
+        return { code: response.status, message: "Data berhasil dihapus" };
+      }
+    }
+    
+    // Handle error status
+    throw new Error(`HTTP error! status: ${response.status}`);
+    
+  } catch (error) {
+    console.error('Error deleting penyuluh:', error);
+    throw error;
+  }
+};
