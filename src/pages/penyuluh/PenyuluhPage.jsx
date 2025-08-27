@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
@@ -10,6 +10,7 @@ import ActionButtons from "./ActionButtons"; // Import komponen tombol aksi
 
 export default function DataPenyuluhanPage() {
   const { authUser } = useAuthContext();
+  const navigate = useNavigate();
   const [dataPenyuluh, setDataPenyuluh] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
@@ -308,11 +309,16 @@ export default function DataPenyuluhanPage() {
                     <td>
                       {/* Penggunaan komponen ActionButtons yang dipersingkat */}
                       <ActionButtons
-                        onEdit={() => handleEdit(item.penyuluhId)}
+                        onEdit={() => {
+                          // Navigasi ke halaman edit
+                          navigate(`/penyuluhan/edit/${item.penyuluhId}`);
+                        }}
                         onDelete={() => {
                           setShowDialog(true);
                           setSelectedId(item.penyuluhId);
                         }}
+                        editTitle="Edit Data Penyuluh"
+                        deleteTitle="Hapus Data Penyuluh"
                       />
                     </td>
                   </tr>

@@ -335,3 +335,73 @@ export const deletePenyuluh = async (authUser, penyuluhId) => {
     throw error;
   }
 };
+
+export const createPenyuluh = async (authUser, data) => {
+  try {
+    const response = await fetch(`http://localhost:8081/api/v1/penyuluh/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${authUser}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Gagal menambahkan data penyuluh");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating penyuluh:", error);
+    throw error;
+  }
+};
+
+// api.js
+// Fungsi untuk mendapatkan detail penyuluh berdasarkan ID menggunakan Fetch
+export const getPenyuluhById = async (authUser, id) => {
+  try {
+    const response = await fetch(`http://localhost:8081/api/v1/penyuluh/get/${id}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${authUser}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching penyuluh:", error);
+    throw error;
+  }
+};
+
+// Fungsi untuk mengupdate data penyuluh menggunakan Fetch
+export const updatePenyuluh = async (authUser, data) => {
+  try {
+    const response = await fetch(`http://localhost:8081/api/v1/penyuluh/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${authUser}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Gagal menambahkan data penyuluh");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating penyuluh:", error);
+    throw error;
+  }
+};

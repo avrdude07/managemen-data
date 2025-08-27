@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/auth/LoginPage";
@@ -6,6 +6,8 @@ import SignupPage from "./pages/auth/SignupPage";
 import ProtectedRoute from "./context/ProtectedRoute";
 import PublicRoute from "./context/PublicRoute";
 import PenyuluhPage from "./pages/penyuluh/PenyuluhPage";
+import TambahDataPenyuluhPage from "./pages/penyuluh/TambahDataPenyuluhPage";
+import EditDataPenyuluhPage from "./pages/penyuluh/EditDataPenyuluhPage";
 import TimesheetPage from "./pages/timesheet/TimesheetPage";
 import CreateTimesheet from "./pages/timesheet/Create";
 import EmployeePage from "./pages/employee/EmployeePage";
@@ -20,6 +22,16 @@ function App() {
   return (
     <main style={{ minHeight: "100vh", width: "100vw" }}>
       <Routes>
+        {/* Route untuk root path - redirect ke halaman sesuai autentikasi */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          } 
+        />
+        
         <Route
           path="/login"
           element={
@@ -28,8 +40,38 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route path="/signup" element={<PublicRoute> <SignupPage /> </PublicRoute>}/>
-        <Route path="/penyuluh" element={<ProtectedRoute> <PenyuluhPage /> </ProtectedRoute>} />
+        <Route 
+          path="/signup" 
+          element={
+            <PublicRoute> 
+              <SignupPage /> 
+            </PublicRoute>
+          }
+        />
+        <Route 
+          path="/penyuluh" 
+          element={
+            <ProtectedRoute> 
+              <PenyuluhPage /> 
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/penyuluhan/tambah" 
+          element={
+            <ProtectedRoute> 
+              <TambahDataPenyuluhPage /> 
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/penyuluhan/edit/:id" 
+          element={
+            <ProtectedRoute> 
+              <EditDataPenyuluhPage /> 
+            </ProtectedRoute>
+          } 
+        />
         <Route
           path="/admin"
           element={
@@ -102,6 +144,16 @@ function App() {
               <HrPage />
             </ProtectedRoute>
           }
+        />
+        
+        {/* Fallback route untuk handle 404 */}
+        <Route 
+          path="*" 
+          element={
+            <ProtectedRoute>
+              <Navigate to="/" replace />
+            </ProtectedRoute>
+          } 
         />
       </Routes>
     </main>
