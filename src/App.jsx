@@ -1,6 +1,6 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import "./App.css";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ProtectedRoute from "./context/ProtectedRoute";
@@ -24,7 +24,7 @@ function App() {
       <Routes>
         {/* Route untuk root path - redirect ke halaman sesuai autentikasi */}
         <Route 
-          path="/" 
+          path="/home" 
           element={
             <ProtectedRoute>
               <HomePage />

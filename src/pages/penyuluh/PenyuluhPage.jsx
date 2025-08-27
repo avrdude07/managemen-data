@@ -66,6 +66,55 @@ export default function DataPenyuluhanPage() {
     }
   };
 
+  const handleDownloadExcel = async () => {
+    try {
+      // Siapkan parameter untuk API
+      const params = {
+        offset: 1,
+        limit: paging.totalData,
+        downloadExcel: 'Y' // Parameter khusus untuk download
+      };
+      
+      // Tambahkan parameter pencarian jika ada
+      if (searchTerm.trim() !== '') {
+        params.namaPenyuluh = searchTerm;
+      }
+      
+      // Panggil API dengan parameter download
+      const response = await getPenyuluhData(authUser, params);
+      
+      // Jika response adalah blob (file Excel), proses download
+      if (response instanceof Blob) {
+        // Buat URL untuk blob
+        const url = window.URL.createObjectURL(response);
+        
+        // Buat elemen anchor untuk download
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        
+        // Beri nama file yang sesuai
+        const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        a.download = `Data_Penyuluh_${currentDate}.xlsx`;
+        
+        // Tambahkan ke dokumen dan klik
+        document.body.appendChild(a);
+        a.click();
+        
+        // Bersihkan
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        // Jika bukan blob, mungkin API mengembalikan response JSON biasa
+        console.log('Response is not a file:', response);
+        alert('Terjadi kesalahan saat mengunduh file');
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      alert('Terjadi kesalahan saat mengunduh file');
+    }
+  };
+
   // Tambahkan fungsi ini di dalam component DataPenyuluhanPage (setelah fungsi lainnya)
   const handleDelete = async () => {
     try {
@@ -245,6 +294,22 @@ export default function DataPenyuluhanPage() {
             </Form>
           </Col>
           <Col md={4} className="text-end">
+            {/* Tombol Download Excel */}
+            <Button 
+              variant="success" 
+              onClick={handleDownloadExcel}
+              className="me-2"
+              style={{
+                backgroundColor: "#10B981",
+                color: "white",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                fontWeight: "500"
+              }}
+            >
+              Download Excel
+            </Button>
             <Link 
               to="/penyuluhan/tambah" 
               className="btn"

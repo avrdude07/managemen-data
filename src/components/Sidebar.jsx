@@ -11,7 +11,7 @@ export default function Sidebar() {
   };
 
   const menuItems = [
-    { path: "/", label: "Home", icon: "🏠" },
+    { path: "/home", label: "Home", icon: "🏠" },
     { path: "/penyuluh", label: "Penyuluh Agama", icon: "👨‍💼" },
   ];
 

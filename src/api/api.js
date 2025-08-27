@@ -290,11 +290,15 @@ export const getPenyuluhData = async (authUser, params = {}) => {
       }
     });
     
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+    // Jika parameter downloadExcel ada dan bernilai 'Y', kita harapkan response blob
+    if (params.downloadExcel === 'Y') {
+      const blob = await response.blob();
+      return blob;
+    } else {
+      // Untuk response biasa (JSON)
+      const data = await response.json();
+      return data;
     }
-    
-    return await response.json();
   } catch (error) {
     console.error('Error fetching penyuluh data:', error);
     throw error;
