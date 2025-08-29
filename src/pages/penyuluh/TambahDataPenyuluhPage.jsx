@@ -13,7 +13,7 @@ export default function TambahDataPenyuluhPage() {
   const [formData, setFormData] = useState({
     namaPenyuluh: "",
     nipPenyuluh: "",
-    jenisKelamin: "L",
+    jenisKelamin: "",
     tempatLahir: "",
     tanggalLahir: "",
     golongan: "",
@@ -114,6 +114,7 @@ export default function TambahDataPenyuluhPage() {
                   onChange={handleChange}
                   required
                 >
+                  <option value="">Pilih Jenis Kelamin</option>
                   <option value="L">Laki-laki</option>
                   <option value="P">Perempuan</option>
                 </Form.Select>

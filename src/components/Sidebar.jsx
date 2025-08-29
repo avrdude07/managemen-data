@@ -18,41 +18,44 @@ export default function Sidebar() {
   return (
     <div
       className="py-5 px-3 min-vh-100"
-      style={{ 
-        width: "250px", 
+      style={{
+        width: "250px",
         minWidth: "250px",
-        background: "linear-gradient(to bottom, #F2EAE1, #F2EAE1)" // Gradien biru tua
+        background: "linear-gradient(to bottom, #F2EAE1, #F2EAE1)", // Gradien biru tua
       }}
     >
       {/* Header dengan warna biru lebih tua */}
-      <div 
+      <div
         className="text-white p-3 mb-4 rounded text-center"
-        style={{ 
-          backgroundColor: "#0f2a47",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" 
+        style={{
+          backgroundColor: " #f59e0b",
+          boxShadow: "0 8px 7px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <h5 className="mb-1">SISTEM PENGELOLAAN</h5>
-        <h5 className="mb-1">DATA</h5>
-        <h5 className="mb-0">BIMAS KATOLIK</h5>
+        <h5
+          style={{ marginBottom: "4px", fontWeight: "600", lineHeight: "1.2" }}
+        >
+          SISTEM PENGELOLAAN DATA
+        </h5>
+      
       </div>
 
       {/* Info Admin */}
-      <div 
+      <div
         className="text-white p-3 mb-4 rounded"
-        style={{ 
+        style={{
           backgroundColor: "#1e4a76",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" 
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         }}
       >
         <div className="d-flex align-items-center">
-          <div 
+          <div
             className="rounded-circle d-flex align-items-center justify-content-center me-2"
-            style={{ 
-              width: "40px", 
-              height: "40px", 
+            style={{
+              width: "40px",
+              height: "40px",
               backgroundColor: "#3b82f6",
-              fontSize: "20px"
+              fontSize: "20px",
             }}
           >
             👤
@@ -77,32 +80,35 @@ export default function Sidebar() {
               className={`text-black mb-2 w-100 d-flex align-items-center ${
                 location.pathname === item.path ? "active-menu" : ""
               }`}
-              style={{ 
+              style={{
                 padding: "12px 15px",
                 transition: "all 0.3s",
                 borderRadius: "5px",
-                backgroundColor: location.pathname === item.path ? "#3b82f6" : "transparent",
+                backgroundColor:
+                  location.pathname === item.path ? "#3b82f6" : "transparent",
               }}
             >
-              <span className="me-3" style={{ fontSize: "1.2rem" }}>{item.icon}</span>
+              <span className="me-3" style={{ fontSize: "1.2rem" }}>
+                {item.icon}
+              </span>
               {item.label}
             </Nav.Link>
           ))}
         </div>
-        
+
         {/* Logout Button */}
         <button
           className="btn w-100 d-flex align-items-center justify-content-center"
-          style={{ 
-            backgroundColor: "#e53e3e", 
+          style={{
+            backgroundColor: "#e53e3e",
             color: "white",
             padding: "12px 15px",
             borderRadius: "5px",
             border: "none",
-            transition: "all 0.3s"
+            transition: "all 0.3s",
           }}
-          onMouseOver={(e) => e.target.style.backgroundColor = "#c53030"}
-          onMouseOut={(e) => e.target.style.backgroundColor = "#e53e3e"}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#c53030")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#e53e3e")}
           onClick={handleLogout}
         >
           <span className="me-2">🚪</span>

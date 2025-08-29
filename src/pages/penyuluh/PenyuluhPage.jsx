@@ -370,7 +370,7 @@ export default function DataPenyuluhanPage() {
                     <td>{item.nomorTelepon}</td>
                     <td>{item.kecamatan}</td>
                     <td>{item.provinsi}</td>
-                    <td>{formatDate(item.makerDate)}</td>
+                    <td>{item.makerDate}</td>
                     <td>
                       {/* Penggunaan komponen ActionButtons yang dipersingkat */}
                       <ActionButtons
