@@ -1,10 +1,40 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
+import { useAuthContext } from "../../context/AuthContext";
 import "./HomePage.css";
 import kemenagLogo from "../../assets/kemenag-logo.png"; // Import logo
+import { getPenyuluhData } from "../../api/api"; // Anda perlu membuat fungsi API ini
 
 
 export default function HomePage() {
+  const { authUser } = useAuthContext();
+  const [totalData, setTotalData] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDataCount = async () => {
+      try {
+        // Panggil API dengan parameter kosong (hanya untuk mendapatkan jumlah data)
+        const response = await getPenyuluhData(authUser, {
+          offset: 1,
+          limit: 10,
+          downloadExcel: 'N' // Parameter khusus untuk download
+        });
+        
+        // Ambil totalData dari response
+        setTotalData(response.response.paging.totalData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data count:", err);
+        setError("Gagal memuat jumlah data");
+        setLoading(false);
+      }
+    };
+
+    fetchDataCount();
+  }, []);
+
   return (
     <div className="layout">
       <Sidebar />
@@ -51,7 +81,9 @@ export default function HomePage() {
                   alt="Foto Kegiatan"
                   className="foto-box"
                 />
-                <p className="foto-caption">Jumlah Data : 120</p>
+                <p className="foto-caption">
+                  {loading ? "Memuat data..." : error ? error : `Jumlah Data : ${totalData}`}
+                </p>
               </div>
             </div>
 

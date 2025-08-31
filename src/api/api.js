@@ -353,7 +353,7 @@ export const createPenyuluh = async (authUser, data) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Gagal menambahkan data penyuluh");
+      throw new Error(errorData.response.errors || "Gagal menambahkan data penyuluh");
     }
 
     return await response.json();
@@ -400,7 +400,7 @@ export const updatePenyuluh = async (authUser, data) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Gagal menambahkan data penyuluh");
+      throw new Error(errorData.response.errors || "Gagal menambahkan data penyuluh");
     }
 
     return await response.json();
