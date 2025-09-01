@@ -2,11 +2,11 @@ import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { getPenyuluhData, deletePenyuluh } from "../../api/api"; // Anda perlu membuat fungsi API ini
+import { getPenyuluhData, deletePenyuluh } from "../../api/api";
 import { format } from "date-fns";
 import ConfirmDialog from "../../components/ConfirmationModal";
-import { Pagination, Form, Row, Col, Button } from "react-bootstrap";
-import ActionButtons from "./ActionButtons"; // Import komponen tombol aksi
+import { Pagination, Form, Row, Col, Button, Modal } from "react-bootstrap";
+import ActionButtons from "./ActionButtons";
 
 export default function DataPenyuluhanPage() {
   const { authUser } = useAuthContext();
@@ -15,7 +15,6 @@ export default function DataPenyuluhanPage() {
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [paging, setPaging] = useState({
     currentData: 0,
     currentPage: 1,
@@ -24,29 +23,35 @@ export default function DataPenyuluhanPage() {
     totalData: 0
   });
 
-  // Tambahkan useEffect khusus untuk menangani reset
+  // State untuk modal filter
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filterNama, setFilterNama] = useState("");
+  const [filterNip, setFilterNip] = useState("");
+
+  // State untuk melacak jenis filter yang aktif
+  const [activeFilter, setActiveFilter] = useState({
+    type: null, // 'nama', 'nip', atau 'both'
+    namaValue: "",
+    nipValue: ""
+  });
+
   useEffect(() => {
-    if (searchTerm === "" && paging.currentPage === 1) {
+    if (!activeFilter.type && paging.currentPage === 1) {
       fetchDataPenyuluh();
     }
-  }, [searchTerm, paging.currentPage]);
+  }, [paging.currentPage]);
   
-  const fetchDataPenyuluh = async () => {
+  const fetchDataPenyuluh = async (params = {}) => {
     try {
       setLoading(true);
       
-      // Siapkan parameter untuk API
-      const params = {
+      const defaultParams = {
         offset: paging.currentPage,
-        limit: paging.pageSize
+        limit: paging.pageSize,
+        ...params
       };
       
-      // Tambahkan parameter pencarian hanya jika searchTerm tidak kosong
-      if (searchTerm.trim() !== '') {
-        params.namaPenyuluh = searchTerm;
-      }
-      
-      const response = await getPenyuluhData(authUser, params);
+      const response = await getPenyuluhData(authUser, defaultParams);
       
       if (response.code === 200) {
         setDataPenyuluh(response.response.data);
@@ -68,44 +73,40 @@ export default function DataPenyuluhanPage() {
 
   const handleDownloadExcel = async () => {
     try {
-      // Siapkan parameter untuk API
+      // Siapkan parameter berdasarkan filter aktif
       const params = {
         offset: 1,
         limit: paging.totalData,
-        downloadExcel: 'Y' // Parameter khusus untuk download
+        downloadExcel: 'Y'
       };
       
-      // Tambahkan parameter pencarian jika ada
-      if (searchTerm.trim() !== '') {
-        params.namaPenyuluh = searchTerm;
+      // Tambahkan parameter sesuai jenis filter
+      if (activeFilter.type === 'nama') {
+        params.namaPenyuluh = activeFilter.namaValue;
+      } else if (activeFilter.type === 'nip') {
+        params.nipPenyuluh = activeFilter.nipValue;
+      } else if (activeFilter.type === 'both') {
+        params.namaPenyuluh = activeFilter.namaValue;
+        params.nipPenyuluh = activeFilter.nipValue;
       }
       
-      // Panggil API dengan parameter download
       const response = await getPenyuluhData(authUser, params);
       
-      // Jika response adalah blob (file Excel), proses download
       if (response instanceof Blob) {
-        // Buat URL untuk blob
         const url = window.URL.createObjectURL(response);
-        
-        // Buat elemen anchor untuk download
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
         
-        // Beri nama file yang sesuai
         const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         a.download = `Data_Penyuluh_${currentDate}.xlsx`;
         
-        // Tambahkan ke dokumen dan klik
         document.body.appendChild(a);
         a.click();
         
-        // Bersihkan
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
-        // Jika bukan blob, mungkin API mengembalikan response JSON biasa
         console.log('Response is not a file:', response);
         alert('Terjadi kesalahan saat mengunduh file');
       }
@@ -115,23 +116,16 @@ export default function DataPenyuluhanPage() {
     }
   };
 
-  // Tambahkan fungsi ini di dalam component DataPenyuluhanPage (setelah fungsi lainnya)
   const handleDelete = async () => {
     try {
-      // Panggil API delete
       const response = await deletePenyuluh(authUser, selectedId);
       
-      // Cek jika response memiliki code 200 atau operasi berhasil
       if (response.code === 200 || response.status === 200) {
-        // Hapus data dari tampilan tanpa perlu reload halaman
         const newData = dataPenyuluh.filter(item => item.penyuluhId !== selectedId);
         setDataPenyuluh(newData);
         
-        // Tampilkan pesan sukses
         alert('Data berhasil dihapus!');
         
-        // Jika halaman kosong setelah penghapusan dan bukan halaman pertama,
-        // kembali ke halaman sebelumnya
         if (newData.length === 0 && paging.currentPage > 1) {
           setPaging({...paging, currentPage: paging.currentPage - 1});
         }
@@ -148,44 +142,86 @@ export default function DataPenyuluhanPage() {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Set halaman ke 1 dan langsung panggil fetchData
+  // Fungsi untuk menerapkan filter
+  const applyFilter = () => {
+    const params = {};
+    let filterType = null;
+    
+    if (filterNama.trim() && filterNip.trim()) {
+      // Jika kedua filter diisi
+      params.namaPenyuluh = filterNama;
+      params.nipPenyuluh = filterNip;
+      filterType = 'both';
+    } else if (filterNama.trim()) {
+      // Jika hanya nama diisi
+      params.namaPenyuluh = filterNama;
+      filterType = 'nama';
+    } else if (filterNip.trim()) {
+      // Jika hanya NIP diisi
+      params.nipPenyuluh = filterNip;
+      filterType = 'nip';
+    }
+    
+    setActiveFilter({ 
+      type: filterType, 
+      namaValue: filterNama,
+      nipValue: filterNip
+    });
     setPaging({...paging, currentPage: 1});
-    fetchDataPenyuluhDirect(1);
+    setShowFilterModal(false);
+    
+    // Jika ada filter, langsung fetch data
+    if (filterType) {
+      fetchDataPenyuluhDirect(1, params);
+    } else {
+      // Jika tidak ada filter, fetch semua data
+      fetchDataPenyuluhDirect(1, {});
+    }
   };
 
-  const handleResetSearch = () => {
-    setSearchTerm(""); // Kosongkan pencarian
-    setPaging({...paging, currentPage: 1}); // Kembali ke halaman 1
+  // Fungsi untuk reset filter
+  const resetFilter = () => {
+    setFilterNama("");
+    setFilterNip("");
+    setActiveFilter({ type: null, namaValue: "", nipValue: "" });
+    setPaging({...paging, currentPage: 1});
+    setShowFilterModal(false);
+    
+    // Fetch data tanpa filter
+    fetchDataPenyuluhDirect(1, {});
   };
 
   const handlePageChange = (page) => {
-    // Update state
     setPaging({...paging, currentPage: page});
     
-    // Langsung fetch dengan page yang baru
-    fetchDataPenyuluhDirect(page);
+    // Siapkan parameter berdasarkan filter aktif
+    const params = {};
+    if (activeFilter.type === 'nama') {
+      params.namaPenyuluh = activeFilter.namaValue;
+    } else if (activeFilter.type === 'nip') {
+      params.nipPenyuluh = activeFilter.nipValue;
+    } else if (activeFilter.type === 'both') {
+      params.namaPenyuluh = activeFilter.namaValue;
+      params.nipPenyuluh = activeFilter.nipValue;
+    }
+    
+    fetchDataPenyuluhDirect(page, params);
   };
 
-  const fetchDataPenyuluhDirect = async (pageNumber) => {
+  const fetchDataPenyuluhDirect = async (pageNumber, params = {}) => {
     try {
       setLoading(true);
       
-      const params = {
-        offset: pageNumber, // ✅ Langsung gunakan parameter
-        limit: paging.pageSize
+      const defaultParams = {
+        offset: pageNumber,
+        limit: paging.pageSize,
+        ...params
       };
       
-      if (searchTerm.trim() !== '') {
-        params.namaPenyuluh = searchTerm;
-      }
-      
-      const response = await getPenyuluhData(authUser, params);
+      const response = await getPenyuluhData(authUser, defaultParams);
       
       if (response.code === 200) {
         setDataPenyuluh(response.response.data);
-        // Update paging dengan response dari server
         setPaging({
           currentData: parseInt(response.response.paging.currentData),
           currentPage: parseInt(response.response.paging.currentPage),
@@ -202,6 +238,18 @@ export default function DataPenyuluhanPage() {
     }
   };
 
+  // Fungsi untuk menampilkan label filter aktif
+  const renderActiveFilterLabel = () => {
+    if (activeFilter.type === 'nama') {
+      return `Nama: ${activeFilter.namaValue}`;
+    } else if (activeFilter.type === 'nip') {
+      return `NIP: ${activeFilter.nipValue}`;
+    } else if (activeFilter.type === 'both') {
+      return `Nama: ${activeFilter.namaValue}, NIP: ${activeFilter.nipValue}`;
+    }
+    return null;
+  };
+
   const formatDate = (timestamp) => {
     return format(new Date(parseInt(timestamp)), "dd/MM/yyyy");
   };
@@ -216,7 +264,6 @@ export default function DataPenyuluhanPage() {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    // Previous button
     items.push(
       <Pagination.Prev
         key="prev"
@@ -225,7 +272,6 @@ export default function DataPenyuluhanPage() {
       />
     );
 
-    // Page numbers
     for (let i = startPage; i <= endPage; i++) {
       items.push(
         <Pagination.Item
@@ -238,7 +284,6 @@ export default function DataPenyuluhanPage() {
       );
     }
 
-    // Next button
     items.push(
       <Pagination.Next
         key="next"
@@ -268,33 +313,39 @@ export default function DataPenyuluhanPage() {
       <div className="p-5" style={{ width: "100%" }}>
         <h2 className="text-center mb-4">Data Penyuluhan</h2>
 
-        {/* Search and Add Button */}
+        {/* Search and Add Button - TOMBOL FILTER DI SEBELAH KIRI */}
         <Row className="mb-4">
           <Col md={8}>
-            <Form onSubmit={handleSearch} className="d-flex">
-              <Form.Control
-                type="text"
-                placeholder="Cari data nama penyuluh..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} // Ini HANYA mengubah state, tidak fetch data
+            <div className="d-flex align-items-center">
+              {/* Tombol Filter - sekarang di sebelah kiri */}
+              <Button 
+                variant="primary" 
+                onClick={() => setShowFilterModal(true)}
                 className="me-2"
-              />
-              <Button type="submit" variant="primary" className="me-2">
-                Cari
+              >
+                <i className="fas fa-filter me-2"></i>Filter Data
               </Button>
-              {searchTerm && (
-                <Button 
-                  variant="outline-secondary" 
-                  onClick={handleResetSearch}
-                  title="Reset pencarian"
-                >
-                  ✕
-                </Button>
+              
+              {/* Tampilkan info filter aktif jika ada */}
+              {activeFilter.type && (
+                <div className="d-inline-block">
+                  <span className="badge bg-info">
+                    Filter: {renderActiveFilterLabel()}
+                    <Button 
+                      variant="link" 
+                      className="text-white p-0 ms-2"
+                      onClick={resetFilter}
+                      title="Hapus filter"
+                    >
+                      ✕
+                    </Button>
+                  </span>
+                </div>
               )}
-            </Form>
+            </div>
           </Col>
           <Col md={4} className="text-end">
-            {/* Tombol Download Excel */}
+            {/* Tombol Download Excel dan Tambah Data tetap di kanan */}
             <Button 
               variant="success" 
               onClick={handleDownloadExcel}
@@ -328,6 +379,43 @@ export default function DataPenyuluhanPage() {
             </Link>
           </Col>
         </Row>
+
+        {/* Modal Filter */}
+        <Modal show={showFilterModal} onHide={() => setShowFilterModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Filter Data Penyuluh</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Nama Penyuluh</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Masukkan nama penyuluh"
+                  value={filterNama}
+                  onChange={(e) => setFilterNama(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>NIP Penyuluh</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Masukkan NIP penyuluh"
+                  value={filterNip}
+                  onChange={(e) => setFilterNip(e.target.value)}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={resetFilter}>
+              Reset
+            </Button>
+            <Button variant="primary" onClick={applyFilter}>
+              Terapkan Filter
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
         {/* Table */}
         <div className="table-responsive">
@@ -372,10 +460,8 @@ export default function DataPenyuluhanPage() {
                     <td>{item.provinsi}</td>
                     <td>{item.makerDate}</td>
                     <td>
-                      {/* Penggunaan komponen ActionButtons yang dipersingkat */}
                       <ActionButtons
                         onEdit={() => {
-                          // Navigasi ke halaman edit
                           navigate(`/penyuluhan/edit/${item.penyuluhId}`);
                         }}
                         onDelete={() => {
@@ -413,7 +499,7 @@ export default function DataPenyuluhanPage() {
         <ConfirmDialog
           show={showDialog}
           onHide={() => setShowDialog(false)}
-          onConfirm={handleDelete} // Ini yang penting - panggil handleDelete
+          onConfirm={handleDelete}
           title="Hapus Data Penyuluh"
           message="Apakah Anda yakin ingin menghapus data ini?"
         />

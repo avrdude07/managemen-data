@@ -17,6 +17,7 @@ export default function TambahDataPenyuluhPage() {
     tempatLahir: "",
     tanggalLahir: "",
     golongan: "",
+    statusAsn: "",
     jabatanPenyuluh: "",
     jurusanPenyuluh: "",
     tempatTugas: "",
@@ -154,10 +155,7 @@ export default function TambahDataPenyuluhPage() {
                   placeholder="Masukkan nomor telepon"
                 />
               </Form.Group>
-            </Col>
-            
-            {/* Kolom Kanan */}
-            <Col md={6}>
+
               <Form.Group className="mb-3">
                 <Form.Label style={{ textAlign: 'left', display: 'block', fontWeight: 'bold' }}>Golongan</Form.Label>
                 <Form.Control
@@ -169,7 +167,24 @@ export default function TambahDataPenyuluhPage() {
                   placeholder="Contoh: III-a"
                 />
               </Form.Group>
-              
+            </Col>
+            
+            {/* Kolom Kanan */}
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ textAlign: 'left', display: 'block', fontWeight: 'bold' }}>Status ASN</Form.Label>
+                <Form.Select
+                  name="statusAsn"
+                  value={formData.statusAsn}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Pilih Status ASN</option>
+                  <option value="PNS">PNS</option>
+                  <option value="PPPK">PPPK</option>
+                </Form.Select>
+              </Form.Group>
+
               <Form.Group className="mb-3">
                 <Form.Label style={{ textAlign: 'left', display: 'block', fontWeight: 'bold' }}>Jabatan Penyuluh</Form.Label>
                 <Form.Control
