@@ -429,6 +429,7 @@ export default function DataPenyuluhanPage() {
                 <th>Tempat Lahir</th>
                 <th>Tanggal Lahir</th>
                 <th>Golongan</th>
+                <th>Status ASN</th>
                 <th>Jabatan</th>
                 <th>Tempat Tugas</th>
                 <th>Pendidikan</th>
@@ -451,6 +452,7 @@ export default function DataPenyuluhanPage() {
                     <td>{item.tempatLahir}</td>
                     <td>{item.tanggalLahir}</td>
                     <td>{item.golongan}</td>
+                    <td>{item.statusAsn}</td>
                     <td>{item.jabatanPenyuluh}</td>
                     <td>{item.tempatTugas}</td>
                     <td>{item.pendidikanTerakhir}</td>

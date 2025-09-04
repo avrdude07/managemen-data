@@ -19,6 +19,7 @@ export default function EditDataPenyuluhPage() {
     tempatLahir: "",
     tanggalLahir: "",
     golongan: "",
+    statusAsn: "",
     jabatanPenyuluh: "",
     jurusanPenyuluh: "",
     tempatTugas: "",
@@ -55,6 +56,7 @@ export default function EditDataPenyuluhPage() {
             tempatLahir: penyuluhData.tempatLahir || "",
             tanggalLahir: penyuluhData.tanggalLahir || "", // Sudah format YYYY-MM-DD
             golongan: penyuluhData.golongan || "",
+            statusAsn: penyuluhData.statusAsn || "",
             jabatanPenyuluh: penyuluhData.jabatanPenyuluh || "",
             jurusanPenyuluh: penyuluhData.jurusanPenyuluh || "",
             tempatTugas: penyuluhData.tempatTugas || "",
@@ -105,7 +107,7 @@ export default function EditDataPenyuluhPage() {
       
       // Sesuaikan dengan struktur response API Anda
       if (response.code === 200 || response.status === 200) {
-        setSuccess("Data penyuluh berhasil ditambahkan!");
+        setSuccess("Data penyuluh berhasil di edit!");
         setTimeout(() => {
           navigate("/penyuluh"); // Redirect ke halaman data penyuluh
         }, 1500);
@@ -221,10 +223,7 @@ export default function EditDataPenyuluhPage() {
                   placeholder="Masukkan nomor telepon"
                 />
               </Form.Group>
-            </Col>
-            
-            {/* Kolom Kanan */}
-            <Col md={6}>
+
               <Form.Group className="mb-3">
                 <Form.Label className="text-start d-block fw-semibold">Golongan</Form.Label>
                 <Form.Control
@@ -235,6 +234,22 @@ export default function EditDataPenyuluhPage() {
                   required
                   placeholder="Contoh: III-a"
                 />
+              </Form.Group>
+            </Col>
+            
+            {/* Kolom Kanan */}
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-start d-block fw-semibold">Status ASN</Form.Label>
+                <Form.Select
+                  name="statusAsn"
+                  value={formData.statusAsn}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="PNS">PNS</option>
+                  <option value="PPPK">PPPK</option>
+                </Form.Select>
               </Form.Group>
               
               <Form.Group className="mb-3">
