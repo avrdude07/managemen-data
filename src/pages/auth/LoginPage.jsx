@@ -25,7 +25,7 @@ export default function LoginPage() {
 
       if (accessToken) {
         saveToken(accessToken);
-        navigate("/penyuluh");
+        navigate("/home");
       } else {
         setStatus("Username or password is wrong");
       }

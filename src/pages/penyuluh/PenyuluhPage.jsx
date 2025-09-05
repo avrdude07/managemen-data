@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react"; // Tambahkan useRef
 import { useAuthContext } from "../../context/AuthContext";
 import { getPenyuluhData, deletePenyuluh } from "../../api/api";
 import { format } from "date-fns";
@@ -35,12 +35,17 @@ export default function DataPenyuluhanPage() {
     nipValue: ""
   });
 
+  // Gunakan useRef untuk melacak apakah ini render pertama
+  const isInitialRender = useRef(true);
+
   useEffect(() => {
-    if (!activeFilter.type && paging.currentPage === 1) {
+    // Hanya panggil API pada render pertama
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
       fetchDataPenyuluh();
     }
-  }, [paging.currentPage]);
-  
+  }, []); // Hanya dijalankan sekali saat mount
+
   const fetchDataPenyuluh = async (params = {}) => {
     try {
       setLoading(true);
@@ -490,11 +495,21 @@ export default function DataPenyuluhanPage() {
         {/* Pagination */}
         <div className="d-flex justify-content-between align-items-center mt-4">
           <div>
-            Menampilkan Data Ke {paging.currentData} Hingga Data Ke {paging.currentData + dataPenyuluh.length - 1} dari {paging.totalData} data
+            {/* Tampilkan pesan hanya jika ada data (dataPenyuluh.length >= 1) */}
+            {dataPenyuluh.length >= 1 && (
+              <span>
+                Menampilkan Data Ke {paging.currentData} Hingga Data Ke {paging.currentData + dataPenyuluh.length - 1} dari {paging.totalData} data
+              </span>
+            )}
+            {/* Jika tidak ada data, tampilkan string kosong (empty) */}
           </div>
-          <Pagination>
-            {renderPagination()}
-          </Pagination>
+          
+          {/* Tampilkan pagination hanya jika ada data dan total halaman > 1 */}
+          {dataPenyuluh.length >= 1 && paging.totalPage > 1 && (
+            <Pagination>
+              {renderPagination()}
+            </Pagination>
+          )}
         </div>
 
         {/* Confirmation Dialog */}

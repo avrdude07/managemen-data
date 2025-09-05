@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { useAuthContext } from "../../context/AuthContext";
@@ -8,7 +8,7 @@ import { Form, Row, Col, Button, Alert, Container, Spinner } from "react-bootstr
 export default function EditDataPenyuluhPage() {
   const { authUser } = useAuthContext();
   const navigate = useNavigate();
-  const { id } = useParams(); // Get ID from URL params
+  const { id } = useParams();
   
   // State untuk form data
   const [formData, setFormData] = useState({
@@ -34,24 +34,24 @@ export default function EditDataPenyuluhPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Gunakan useRef untuk melacak apakah sudah fetch data
+  const hasFetched = useRef(false);
+
   // Fungsi untuk mengambil data penyuluh berdasarkan ID
   const fetchPenyuluhData = async () => {
     try {
         setFetching(true);
         const response = await getPenyuluhById(authUser, id);
         
-        console.log("Response dari API:", response); // Debugging
+        console.log("Response dari API:", response);
         
-        // Perhatikan: response.code adalah string "200", bukan number 200
         if (response.code === "200" || response.code === 200) {
-            // Data berada di response.response (sesuai struktur Anda)
             const penyuluhData = response.response;
             
-            // Format data untuk form - konversi number ke string jika needed
             const formattedData = {
             penyuluhId: penyuluhData.penyuluhId,
             namaPenyuluh: penyuluhData.namaPenyuluh || "",
-            nipPenyuluh: penyuluhData.nipPenyuluh?.toString() || "", // Convert number to string
+            nipPenyuluh: penyuluhData.nipPenyuluh?.toString() || "",
             jenisKelamin: penyuluhData.jenisKelamin || "L",
             tempatLahir: penyuluhData.tempatLahir || "",
             tanggalLahir: penyuluhData.tanggalLahir || "", // Sudah format YYYY-MM-DD
@@ -66,7 +66,7 @@ export default function EditDataPenyuluhPage() {
             provinsi: penyuluhData.provinsi || ""
             };
             
-            console.log("Formatted data untuk form:", formattedData); // Debugging
+            console.log("Formatted data untuk form:", formattedData);
             setFormData(formattedData);
         } else {
             setError("Gagal mengambil data penyuluh: " + (response.message || "Unknown error"));
@@ -80,10 +80,12 @@ export default function EditDataPenyuluhPage() {
   };
 
   useEffect(() => {
-    if (id) {
+    // Hanya fetch data jika id ada dan belum pernah fetch
+    if (id && !hasFetched.current) {
+      hasFetched.current = true; // Tandai bahwa sudah fetch
       fetchPenyuluhData();
     }
-  }, [id]);
+  }, [id]); // Hanya depend pada id
 
   // Handle perubahan input
   const handleChange = (e) => {
@@ -102,14 +104,12 @@ export default function EditDataPenyuluhPage() {
     setSuccess("");
     
     try {
-      // Panggil fungsi updatePenyuluh
       const response = await updatePenyuluh(authUser, formData);
       
-      // Sesuaikan dengan struktur response API Anda
       if (response.code === 200 || response.status === 200) {
         setSuccess("Data penyuluh berhasil di edit!");
         setTimeout(() => {
-          navigate("/penyuluh"); // Redirect ke halaman data penyuluh
+          navigate("/penyuluh");
         }, 1500);
       } else {
         setError(response.message || "Gagal menambahkan data");
