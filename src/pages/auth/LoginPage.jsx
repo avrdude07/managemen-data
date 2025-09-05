@@ -70,13 +70,13 @@ export default function LoginPage() {
                     className="form-label fw-semibold text-start"
                     style={{ width: "100%" }}
                   >
-                    Email
+                    Username
                   </label>
                   <Field
                     type="text"
                     className="form-control"
                     name="username"
-                    placeholder="Enter your email"
+                    placeholder="Enter your username"
                   />
                   <ErrorMessage
                     name="username"

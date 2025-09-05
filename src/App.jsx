@@ -24,7 +24,7 @@ function App() {
       <Routes>
         {/* Route untuk root path - redirect ke halaman sesuai autentikasi */}
         <Route 
-          path="/home" 
+          path="/" 
           element={
             <ProtectedRoute>
               <HomePage />
